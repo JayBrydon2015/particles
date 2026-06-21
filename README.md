@@ -102,10 +102,41 @@ person to blame if things do not work as expected.
 Bug reports, feature requests, questions, rants, etc are welcome, preferably 
 on the github page.
 
-# Changes in this fork ##
+# Changes in this fork #
 
 The addition of `particles/augmented_state_space_models.py` is the only change. This allows for bootstrap and guided particle filters to be run on augmented state-space models, a variation of the state-space model where observations depend on the previous: $Y_{t-1} \rightarrow Y_t$.
 
+![Diagram of a typical state-space model.](SSM_Diagram.png)
 
+![Diagram of an augmented state-space model.](Augmented_SSM_Diagram.png)
 
+## Example ##
 
+Below is an example of defining an augmented state-space model. **Note:** `datap` ($Y_{t-1}$) should have a default value of `None` for the case when $t = 0$.
+
+```python
+import particles
+from particles import augmented_state_space_models as augssm
+from particles import distributions as dists
+
+class ToyAugSSM(augssm.AugmentedStateSpaceModel):
+    def PX0(self):  # Distribution of X_0 
+        return dists.Normal()  # X_0 ~ N(0, 1)
+    def PX(self, t, xp):  # Distribution of X_t given X_{t-1}
+        return dists.Normal(loc=xp)  # X_t ~ N( X_{t-1}, 1)
+    def PY(self, t, xp, x, datap=None):  # Distribution of Y_t given X_t and Y_{t-1} (and X_{t-1}) 
+        if datap is None: # t == 0
+            return dists.Normal(loc=x, scale=self.sigma)  # Y_0 ~ N(X_0, sigma^2)
+        else: # t >= 1
+            return dists.Normal(loc = x + datap, scale=self.sigma)  # Y_t ~ N(X_t + Y_{t-1}, sigma^2), t >= 1
+```
+
+Simulate data from it as per usual. To run a bootstrap particle filter, use `AugmentedBootstrap`.
+
+```python
+my_model = ToyAugSSM(sigma=0.2)
+x, y = my_model.simulate(200)  # sample size is 200
+
+alg = particles.SMC(fk=augssm.AugmentedBootstrap(ssm=my_model, data=y), N=200)
+alg.run()
+```
