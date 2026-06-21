@@ -100,4 +100,12 @@ Nicolas Chopin (nicolas.chopin@ensae.fr) is the main author, contributor, and
 person to blame if things do not work as expected. 
 
 Bug reports, feature requests, questions, rants, etc are welcome, preferably 
-on the github page. 
+on the github page.
+
+# Changes in this fork ##
+
+The addition of `particles/augmented_state_space_models.py` is the only change. This allows for bootstrap and guided particle filters to be run on augmented state-space models, a variation of the state-space model where observations depend on the previous: $Y_{t-1} \rightarrow Y_t$.
+
+
+
+
