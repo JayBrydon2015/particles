@@ -140,3 +140,7 @@ x, y = my_model.simulate(200)  # sample size is 200
 alg = particles.SMC(fk=augssm.AugmentedBootstrap(ssm=my_model, data=y), N=200)
 alg.run()
 ```
+
+## Installing this fork ##
+
+See `INSTALL` for instructions on installing this package into your Python environment. However, instead of cloning the original particles package locally via `git clone https://github.com/nchopin/particles.git`, clone this fork via `git clone https://github.com/JayBrydon2015/particles.git`. You can install this fork without needing to clone it locally via `pip install git+https://github.com/JayBrydon2015/particles.git`.
